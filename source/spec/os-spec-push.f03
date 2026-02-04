@@ -369,7 +369,7 @@ subroutine dudt_boris( this, emf, dt, i0, i1, energy, t )
   real(p_double), intent(inout) :: energy
   real(p_double), intent(in) :: t
 
-  real(p_k_part) :: tem
+  real(p_k_part) :: tem, tem1, tem2
   integer :: i, ptrcur, np, pp
   real(p_k_part), dimension(p_p_dim,p_cache_size) :: bp, ep, utemp
 
@@ -398,7 +398,7 @@ subroutine dudt_boris( this, emf, dt, i0, i1, energy, t )
   !Thermodynamic forcing
   !Similar to tem we can precalculate a lot of the coefficients
   tem1 = 1.5_p_double * this%v_th**2
-  tem2 = 0.5_p_double * this%rmq / this%L_T
+  tem2 = 0.5_p_double * this%rqm / this%L_T
 
   !loop through all particles
   do ptrcur = i0, i1, p_cache_size
@@ -473,8 +473,8 @@ subroutine dudt_boris( this, emf, dt, i0, i1, energy, t )
     pp = ptrcur
     do i=1, np
       u2 = this%p(1,pp)**2 + this%p(2,pp)**2 + this%p(3,pp)**2
-      if (u2 < 100 * v_th**2) then
-        ep(1,i) = ep(1,i) + tmp2 * (u2 - tmp1)
+      if (u2 < 100 * this%v_th**2) then
+        ep(1,i) = ep(1,i) + tem2 * (u2 - tem1)
       end if
       pp = pp + 1
     end do
