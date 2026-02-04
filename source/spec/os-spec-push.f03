@@ -464,6 +464,8 @@ subroutine dudt_boris( this, emf, dt, i0, i1, energy, t )
     end do
 #endif
 
+    ! Apply effective electric field modification with temperature gradient scale length
+    ! Note: L_T should have units consistent with electric field * time / rqm
     do i=1, np
       ep(1,i) = ep(1,i) * tem + this%L_T
       ep(2,i) = ep(2,i) * tem + this%L_T
