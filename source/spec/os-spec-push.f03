@@ -391,9 +391,14 @@ subroutine dudt_boris( this, emf, dt, i0, i1, energy, t )
   ! note that the charge-to-mass ratio is used since the
   ! momentum p is not the total momentum of a particles but
   ! the momentum per unit restmass (which is the electron mass)
-
+  
   fac = this%k_rr * this%q_real * dt * 0.5_p_k_part / this%rqm
   tem = real( 0.5_p_double * (dt / this%rqm), p_k_part )
+  
+  !Thermodynamic forcing
+  !Similar to tem we can precalculate a lot of the coefficients
+  tem1 = 1.5_p_double * this%v_th**2
+  tem2 = 0.5_p_double * this%rmq / this%L_T
 
   !loop through all particles
   do ptrcur = i0, i1, p_cache_size
@@ -463,6 +468,16 @@ subroutine dudt_boris( this, emf, dt, i0, i1, energy, t )
       pp = pp + 1
     end do
 #endif
+    !Adding in thermodynamic forcing implimentation
+    
+    pp = ptrcur
+    do i=1, np
+      u2 = this%p(1,pp)**2 + this%p(2,pp)**2 + this%p(3,pp)**2
+      if (u2 < 100 * v_th**2) then
+        ep(1,i) = ep(1,i) + tmp2 * (u2 - tmp1)
+      end if
+      pp = pp + 1
+    end do
 
     do i=1, np
       ep(1,i) = ep(1,i) * tem
@@ -565,6 +580,7 @@ subroutine dudt_boris( this, emf, dt, i0, i1, energy, t )
     end do
 
     ! Perform second half of electric field acceleration.
+    
     pp = ptrcur
     do i=1,np
       this%p(1,pp) = utemp(1,i) + ep(1,i)
