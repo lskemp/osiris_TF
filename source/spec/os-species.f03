@@ -877,6 +877,7 @@ subroutine read_input_species( this, input_file, def_name, periodic, if_move, gr
 
   real(p_double) :: iter_tol
   logical :: rad_react
+  real(p_k_part) :: L_T
 
 #ifdef __HAS_SPIN__
 
@@ -885,7 +886,7 @@ subroutine read_input_species( this, input_file, def_name, periodic, if_move, gr
                         push_start_time, num_pistons, &
                         add_tag, free_stream, init_fields, &
                         if_collide, if_like_collide, init_type, iter_tol, rad_react, &
-                        anom_mag_moment
+                        anom_mag_moment, L_T
 
 #else
 
@@ -893,7 +894,7 @@ subroutine read_input_species( this, input_file, def_name, periodic, if_move, gr
                         num_par_x, tot_par_x, push_type, &
                         push_start_time, num_pistons, &
                         add_tag, free_stream, init_fields, &
-                        if_collide, if_like_collide, init_type, iter_tol, rad_react
+                        if_collide, if_like_collide, init_type, iter_tol, rad_react, L_T
 #endif
 
   integer :: i, ierr, piston_id
@@ -940,6 +941,9 @@ subroutine read_input_species( this, input_file, def_name, periodic, if_move, gr
 
   ! if include radiation reaction (only valid for exact pusher)
   rad_react = .false.
+
+  ! temperature gradient scale length parameter
+  L_T = 0.0_p_k_part
 
   ! Get namelist text from input file
   call get_namelist( input_file, "nl_species", ierr )
@@ -1088,6 +1092,9 @@ subroutine read_input_species( this, input_file, def_name, periodic, if_move, gr
       stop
     endif
   endif
+
+  ! temperature gradient scale length parameter
+  this%L_T = L_T
 
   ! Free streaming is not implemented in simd code
   if ( free_stream ) then

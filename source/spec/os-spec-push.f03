@@ -465,9 +465,9 @@ subroutine dudt_boris( this, emf, dt, i0, i1, energy, t )
 #endif
 
     do i=1, np
-      ep(1,i) = ep(1,i) * tem
-      ep(2,i) = ep(2,i) * tem
-      ep(3,i) = ep(3,i) * tem
+      ep(1,i) = ep(1,i) * tem + this%L_T
+      ep(2,i) = ep(2,i) * tem + this%L_T
+      ep(3,i) = ep(3,i) * tem + this%L_T
     end do
 
     ! Perform first half of electric field acceleration.

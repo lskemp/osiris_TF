@@ -474,6 +474,9 @@ type :: t_species
   real(p_k_part) :: k_rr ! leading coefficient of RR
   logical :: rad_react = .false.
 
+  ! Temperature gradient scale length parameter
+  real(p_k_part) :: L_T = 0.0_p_k_part
+
   ! Pointer to dudt function used by some pushers
   procedure(dudt_species), pointer :: dudt => null()
 
