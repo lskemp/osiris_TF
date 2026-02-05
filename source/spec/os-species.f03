@@ -879,6 +879,8 @@ subroutine read_input_species( this, input_file, def_name, periodic, if_move, gr
   logical :: rad_react
   real(p_k_part) :: L_T
   real(p_k_part) :: v_th
+  real(p_k_part), dimension(p_p_dim) :: a
+  real(p_k_part), dimension(p_p_dim, p_p_dim) :: W
 #ifdef __HAS_SPIN__
 
   namelist /nl_species/ name, num_par_max, n_sort, rqm, q_real, &
@@ -886,7 +888,7 @@ subroutine read_input_species( this, input_file, def_name, periodic, if_move, gr
                         push_start_time, num_pistons, &
                         add_tag, free_stream, init_fields, &
                         if_collide, if_like_collide, init_type, iter_tol, rad_react, &
-                        anom_mag_moment, L_T, v_th
+                        anom_mag_moment, L_T, v_th, a, W
 
 #else
 
@@ -894,7 +896,7 @@ subroutine read_input_species( this, input_file, def_name, periodic, if_move, gr
                         num_par_x, tot_par_x, push_type, &
                         push_start_time, num_pistons, &
                         add_tag, free_stream, init_fields, &
-                        if_collide, if_like_collide, init_type, iter_tol, rad_react, L_T, v_th
+                        if_collide, if_like_collide, init_type, iter_tol, rad_react, L_T, v_th, a, W
 #endif
 
   integer :: i, ierr, piston_id
@@ -944,10 +946,15 @@ subroutine read_input_species( this, input_file, def_name, periodic, if_move, gr
   
   ! Thermodynamic forcing parameters
   ! Temperature gradient scale length parameter
-  L_T = 0.0_p_k_part
+  L_T = 1.0_p_k_part
   ! Thermal velocity parameter
   v_th = 0.0_p_k_part
-
+  ! The direction of the temperature gradient
+  a = 0.0_p_k_part
+  ! The sheer matrix
+  W = 0.0_p_k_part
+  !End of thermodynamic forcing additions
+  
   ! Get namelist text from input file
   call get_namelist( input_file, "nl_species", ierr )
   if (ierr /= 0) then
@@ -1101,6 +1108,11 @@ subroutine read_input_species( this, input_file, def_name, periodic, if_move, gr
   this%L_T = L_T
   ! Thermal velocity parameter
   this%v_th = v_th
+  ! The direction of the temperature gradient
+  this%a = a
+  ! The sheer matrix
+  this%W = W
+  !End of thermodynamic forcing parameter
 
   ! Free streaming is not implemented in simd code
   if ( free_stream ) then
