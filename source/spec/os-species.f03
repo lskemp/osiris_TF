@@ -951,7 +951,7 @@ subroutine read_input_species( this, input_file, def_name, periodic, if_move, gr
   v_th = 0.0_p_k_part
   ! The direction of the temperature gradient
   a = 0.0_p_k_part
-  ! The sheer matrix
+  ! The shear matrix
   W = 0.0_p_k_part
   !End of thermodynamic forcing additions
   
@@ -1110,7 +1110,7 @@ subroutine read_input_species( this, input_file, def_name, periodic, if_move, gr
   this%v_th = v_th
   ! The direction of the temperature gradient
   this%a = a
-  ! The sheer matrix
+  ! The shear matrix
   this%W = W
   !End of thermodynamic forcing parameter
 

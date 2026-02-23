@@ -481,10 +481,10 @@ type :: t_species
   ! Thermal velocity parameter
   real(p_k_part) :: v_th = 0.0_p_k_part ![v_th = sqrt(2T/m)]
   
-  ! The direction vector for thermodynamic forcing
+  ! The direction of temperature gradient
   real(p_k_part), dimension(p_p_dim) :: a = 0.0_p_k_part
 
-  ! The sheer term
+  ! The shear term
   real(p_k_part), dimension(p_p_dim,p_p_dim) :: W = 0.0_p_k_part
 
   !End of thermodynamic forcing additional terms

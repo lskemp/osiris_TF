@@ -473,7 +473,7 @@ subroutine dudt_boris( this, emf, dt, i0, i1, energy, t )
       pp = pp + 1
     end do
 #endif
-    !Adding in thermodynamic forcing implimentation
+    !Adding in thermodynamic forcing implmentation
     
     pp = ptrcur
     do i=1, np
@@ -484,7 +484,7 @@ subroutine dudt_boris( this, emf, dt, i0, i1, energy, t )
         ep(2,i) = ep(2,i) + pre1(2) * (u2 - pre2)
         ep(3,i) = ep(3,i) + pre1(3) * (u2 - pre2)
         
-        ! The effect of the sheer force
+        ! The effect of the shear force
         ep(1,i) = ep(1,i) + pre3 * (this%W(1,1) * this%p(1,pp) + this%W(1,2) * this%p(2,pp) + this%W(1,3) * this%p(3,pp))
         ep(2,i) = ep(2,i) + pre3 * (this%W(2,1) * this%p(1,pp) + this%W(2,2) * this%p(2,pp) + this%W(2,3) * this%p(3,pp))
         ep(3,i) = ep(3,i) + pre3 * (this%W(3,1) * this%p(1,pp) + this%W(3,2) * this%p(2,pp) + this%W(3,3) * this%p(3,pp))
