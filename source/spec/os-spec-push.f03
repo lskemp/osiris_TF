@@ -370,8 +370,7 @@ subroutine dudt_boris( this, emf, dt, i0, i1, energy, t )
   real(p_double), intent(in) :: t
 
   real(p_k_part) :: tem
-  real(p_k_part), dimension(p_p_dim) :: pre1
-  real(p_k_part) :: pre2, pre3
+  real(p_k_part) :: pre3
   integer :: i, ptrcur, np, pp
   real(p_k_part), dimension(p_p_dim,p_cache_size) :: bp, ep, utemp
 
@@ -399,10 +398,6 @@ subroutine dudt_boris( this, emf, dt, i0, i1, energy, t )
   
   !Thermodynamic forcing
   !Similar to tem we can precalculate a lot of the coefficients
-  pre1(1) = 0.5_p_double * this%rqm / this%L_T * this%a(1)
-  pre1(2) = 0.5_p_double * this%rqm / this%L_T * this%a(2)
-  pre1(3) = 0.5_p_double * this%rqm / this%L_T * this%a(3)
-  pre2 = 1.5_p_double * this%v_th**2
   pre3 = 0.5_p_double * this%rqm
 
   !loop through all particles
@@ -473,22 +468,13 @@ subroutine dudt_boris( this, emf, dt, i0, i1, energy, t )
       pp = pp + 1
     end do
 #endif
-    !Adding in thermodynamic forcing implimentation
+    !Adding in thermodynamic forcing implmentation
     
     pp = ptrcur
     do i=1, np
-      u2 = this%p(1,pp)**2 + this%p(2,pp)**2 + this%p(3,pp)**2
-      if (u2 < 100 * this%v_th**2) then
-        ! The effect of the temperature gradient force
-        ep(1,i) = ep(1,i) + pre1(1) * (u2 - pre2)
-        ep(2,i) = ep(2,i) + pre1(2) * (u2 - pre2)
-        ep(3,i) = ep(3,i) + pre1(3) * (u2 - pre2)
-        
-        ! The effect of the sheer force
-        ep(1,i) = ep(1,i) + pre3 * (this%W(1,1) * this%p(1,pp) + this%W(1,2) * this%p(2,pp) + this%W(1,3) * this%p(3,pp))
-        ep(2,i) = ep(2,i) + pre3 * (this%W(2,1) * this%p(1,pp) + this%W(2,2) * this%p(2,pp) + this%W(2,3) * this%p(3,pp))
-        ep(3,i) = ep(3,i) + pre3 * (this%W(3,1) * this%p(1,pp) + this%W(3,2) * this%p(2,pp) + this%W(3,3) * this%p(3,pp))
-      end if
+      ! The effect of the shear force
+      ep(1,i) = ep(1,i) + pre3 * (this%W(1,1) * this%p(1,pp) + this%W(1,2) * this%p(2,pp))
+      ep(2,i) = ep(2,i) + pre3 * (this%W(2,1) * this%p(1,pp) + this%W(2,2) * this%p(2,pp))
       pp = pp + 1
     end do
 
@@ -510,7 +496,7 @@ subroutine dudt_boris( this, emf, dt, i0, i1, energy, t )
       utemp(3,i) = this%p(3,pp) + ep(3,i)
 
       ! Get time centered gamma
-      u2 =  (utemp(1,i)**2 + utemp(2,i)**2) + utemp(3,i)**2
+      u2 =  utemp(1,i)**2 + utemp(2,i)**2 + utemp(3,i)**2
 
 #ifdef __HAS_SPIN__
 

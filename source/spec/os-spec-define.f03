@@ -475,16 +475,7 @@ type :: t_species
   logical :: rad_react = .false.
 
   !Inputs for thermodynamic forcing
-  ! Temperature gradient scale length parameter
-  real(p_k_part) :: L_T = 1.0_p_k_part
-  
-  ! Thermal velocity parameter
-  real(p_k_part) :: v_th = 0.0_p_k_part ![v_th = sqrt(2T/m)]
-  
-  ! The direction vector for thermodynamic forcing
-  real(p_k_part), dimension(p_p_dim) :: a = 0.0_p_k_part
-
-  ! The sheer term
+  ! The shear term
   real(p_k_part), dimension(p_p_dim,p_p_dim) :: W = 0.0_p_k_part
 
   !End of thermodynamic forcing additional terms
