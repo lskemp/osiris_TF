@@ -473,8 +473,9 @@ subroutine dudt_boris( this, emf, dt, i0, i1, energy, t )
     pp = ptrcur
     do i=1, np
       ! The effect of the shear force
-      ep(1,i) = ep(1,i) + pre3 * this%W(1,2) * this%p(2,pp)
-      ep(2,i) = ep(2,i) + pre3 * this%W(2,1) * this%p(1,pp)
+      ep(1,i) = ep(1,i) + pre3 * this%W(1,1) * this%p(1,pp)
+      ep(2,i) = ep(2,i) + pre3 * this%W(2,2) * this%p(2,pp)
+      ep(3,i) = ep(3,i) + pre3 * this%W(3,3) * this%p(3,pp)
       pp = pp + 1
     end do
 
