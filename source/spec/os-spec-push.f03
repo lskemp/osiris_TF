@@ -370,6 +370,8 @@ subroutine dudt_boris( this, emf, dt, i0, i1, energy, t )
   real(p_double), intent(in) :: t
 
   real(p_k_part) :: tem
+  real(p_k_part), dimension(p_p_dim) :: pre1
+  real(p_k_part) :: pre2, pre3
   integer :: i, ptrcur, np, pp
   real(p_k_part), dimension(p_p_dim,p_cache_size) :: bp, ep, utemp
 
@@ -391,9 +393,17 @@ subroutine dudt_boris( this, emf, dt, i0, i1, energy, t )
   ! note that the charge-to-mass ratio is used since the
   ! momentum p is not the total momentum of a particles but
   ! the momentum per unit restmass (which is the electron mass)
-
+  
   fac = this%k_rr * this%q_real * dt * 0.5_p_k_part / this%rqm
   tem = real( 0.5_p_double * (dt / this%rqm), p_k_part )
+  
+  !Thermodynamic forcing
+  !Similar to tem we can precalculate a lot of the coefficients
+  pre1(1) = 0.5_p_double * this%rqm / this%L_T * this%a(1)
+  pre1(2) = 0.5_p_double * this%rqm / this%L_T * this%a(2)
+  pre1(3) = 0.5_p_double * this%rqm / this%L_T * this%a(3)
+  pre2 = 1.5_p_double * this%v_th**2
+  pre3 = 0.5_p_double * this%rqm
 
   !loop through all particles
   do ptrcur = i0, i1, p_cache_size
@@ -463,6 +473,24 @@ subroutine dudt_boris( this, emf, dt, i0, i1, energy, t )
       pp = pp + 1
     end do
 #endif
+    !Adding in thermodynamic forcing implmentation
+    
+    pp = ptrcur
+    do i=1, np
+      u2 = this%p(1,pp)**2 + this%p(2,pp)**2 + this%p(3,pp)**2
+      if (u2 < 100 * this%v_th**2) then
+        ! The effect of the temperature gradient force
+        ep(1,i) = ep(1,i) + pre1(1) * (u2 - pre2)
+        ep(2,i) = ep(2,i) + pre1(2) * (u2 - pre2)
+        ep(3,i) = ep(3,i) + pre1(3) * (u2 - pre2)
+        
+        ! The effect of the shear force
+        ep(1,i) = ep(1,i) + pre3 * (this%W(1,1) * this%p(1,pp) + this%W(1,2) * this%p(2,pp) + this%W(1,3) * this%p(3,pp))
+        ep(2,i) = ep(2,i) + pre3 * (this%W(2,1) * this%p(1,pp) + this%W(2,2) * this%p(2,pp) + this%W(2,3) * this%p(3,pp))
+        ep(3,i) = ep(3,i) + pre3 * (this%W(3,1) * this%p(1,pp) + this%W(3,2) * this%p(2,pp) + this%W(3,3) * this%p(3,pp))
+      end if
+      pp = pp + 1
+    end do
 
     do i=1, np
       ep(1,i) = ep(1,i) * tem
@@ -565,6 +593,7 @@ subroutine dudt_boris( this, emf, dt, i0, i1, energy, t )
     end do
 
     ! Perform second half of electric field acceleration.
+    
     pp = ptrcur
     do i=1,np
       this%p(1,pp) = utemp(1,i) + ep(1,i)
