@@ -372,6 +372,10 @@ subroutine report_temperature_species( spec, no_co, tstep, t )
 !  Writes mean kinetic energy of particles to file,
 !  respecting fluid velocity. <ekin> = (3/2) kB T
 !  Units: [m_e c^2]
+!  Also updates spec%v_th (thermal velocity, units of c) for use
+!  by the thermodynamic forcing pusher.  Definition used:
+!    v_th = sqrt(2T/m),  with  <ekin> = (3/2) T/m  (non-relativistic)
+!  => v_th = sqrt( (4/3) * e_kin_tot * rq_tot )    [units of c]
 !---------------------------------------------------
 
   use m_utilities, only : lorentz_transform
@@ -380,7 +384,7 @@ subroutine report_temperature_species( spec, no_co, tstep, t )
   implicit none
 
 !       dummy variables
-  class( t_species ),              intent(in) :: spec
+  class( t_species ),              intent(inout) :: spec
   class( t_node_conf ),            intent(in) :: no_co
   type( t_time_step ),            intent(in) :: tstep
   real(p_double),                 intent(in) :: t
@@ -585,7 +589,7 @@ subroutine report_temperature_species( spec, no_co, tstep, t )
      total(4) = su_tot
      total(5) = sv_tot
 
-     call reduce_array( no_co, total, operation = p_sum, all = .false. )
+     call reduce_array( no_co, total, operation = p_sum, all = .true. )
 
 
      e_kin_tot = total(1)
@@ -593,6 +597,15 @@ subroutine report_temperature_species( spec, no_co, tstep, t )
      vu_tot = total(3)
      su_tot = total(4)
      sv_tot = total(5)
+
+     ! Update thermal velocity on all MPI ranks so it is available during pushing.
+     ! v_th = sqrt(2T/m) with <ekin> = (3/2)T/m  =>  v_th = sqrt((4/3) * e_kin_tot * rq_tot)
+     ! Note: e_kin_tot and rq_tot carry the same sign as the particle charge (negative for
+     ! electrons), so their product is always non-negative.  The abs() guards against any
+     ! numerical edge case.  Guard also against empty species (q_tot == 0).
+     if ( q_tot /= 0.0_p_double ) then
+       spec%v_th = real( sqrt( abs( (4.0_p_double/3.0_p_double) * e_kin_tot * rq_tot ) ), p_k_part )
+     endif
 
    !          ! communications for g1_min and g1_max
    !          call glob_min( g1_min, no_co )
