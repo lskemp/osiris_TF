@@ -878,7 +878,7 @@ subroutine read_input_species( this, input_file, def_name, periodic, if_move, gr
   real(p_double) :: iter_tol
   logical :: rad_react
   real(p_k_part) :: L_T
-  real(p_k_part) :: v_th
+  real(p_k_part) :: theta
   real(p_k_part), dimension(p_p_dim) :: a
   real(p_k_part), dimension(p_p_dim, p_p_dim) :: W
 #ifdef __HAS_SPIN__
@@ -888,7 +888,7 @@ subroutine read_input_species( this, input_file, def_name, periodic, if_move, gr
                         push_start_time, num_pistons, &
                         add_tag, free_stream, init_fields, &
                         if_collide, if_like_collide, init_type, iter_tol, rad_react, &
-                        anom_mag_moment, L_T, v_th, a, W
+                        anom_mag_moment, L_T, theta, a, W
 
 #else
 
@@ -896,7 +896,7 @@ subroutine read_input_species( this, input_file, def_name, periodic, if_move, gr
                         num_par_x, tot_par_x, push_type, &
                         push_start_time, num_pistons, &
                         add_tag, free_stream, init_fields, &
-                        if_collide, if_like_collide, init_type, iter_tol, rad_react, L_T, v_th, a, W
+                        if_collide, if_like_collide, init_type, iter_tol, rad_react, L_T, theta, a, W
 #endif
 
   integer :: i, ierr, piston_id
@@ -948,7 +948,7 @@ subroutine read_input_species( this, input_file, def_name, periodic, if_move, gr
   ! Temperature gradient scale length parameter
   L_T = 1.0_p_k_part
   ! Thermal velocity parameter
-  v_th = 0.0_p_k_part
+  theta = 0.0_p_k_part
   ! The direction of the temperature gradient
   a = 0.0_p_k_part
   ! The shear matrix
@@ -1107,7 +1107,7 @@ subroutine read_input_species( this, input_file, def_name, periodic, if_move, gr
   ! Temperature gradient scale length parameter
   this%L_T = L_T
   ! Thermal velocity parameter
-  this%v_th = v_th
+  this%theta = theta
   ! The direction of the temperature gradient
   this%a = a
   ! The shear matrix
