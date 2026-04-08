@@ -479,7 +479,7 @@ type :: t_species
   real(p_k_part) :: L_T = 0.0_p_k_part
   
   ! Thermal velocity parameter
-  real(p_k_part) :: v_th = 0.0_p_k_part ![v_th = sqrt(2T/m)]
+  real(p_k_part) :: theta = 0.0_p_k_part
   
   ! Pointer to dudt function used by some pushers
   procedure(dudt_species), pointer :: dudt => null()
